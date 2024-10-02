@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sameirotravel - Registros de Viagens</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+        form label {
+            display: block;
+            margin-top: 10px;
+        }
+        form input, form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        form button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            background-color: #e9f3ff;
+        }
+        button.delete-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.delete-button:hover {
+            background-color: #c82333;
+        }
+        .print-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .print-button:hover {
+            background-color: #218838;
+        }
+        .logo {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function printPage() {
+            var originalContent = document.body.innerHTML;
+            var printContent = document.getElementById('print-section').innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo da empresa -->
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Sameirotravel - Viagens e Turismo" class="logo">
+
+        <h1>Sameirotravel - Registros de Viagens</h1>
+
+        <!-- Formulário para adicionar uma entrada -->
+        <form action="{{ url_for('add_entrada') }}" method="POST">
+            <label for="data">Data:</label>
+            <input type="date" id="data" name="data" required>
+
+            <label for="dia_semana">Dia da Semana:</label>
+            <input type="text" id="dia_semana" name="dia_semana" required>
+
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" name="cidade" required>
+
+            <label for="responsavel">Responsável:</label>
+            <input type="text" id="responsavel" name="responsavel" required>
+
+            <label for="horario">Horário:</label>
+            <input type="text" id="horario" name="horario" required>
+
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" name="descricao" rows="4" required></textarea>
+
+            <label for="tempo_conducao">Tempo de Condução:</label>
+            <input type="text" id="tempo_conducao" name="tempo_conducao" required>
+
+            <label for="observacoes">Observações:</label>
+            <textarea id="observacoes" name="observacoes" rows="3"></textarea>
+
+            <button type="submit">Adicionar Entrada</button>
+        </form>
+
+        <!-- Botão de imprimir -->
+        <button class="print-button" onclick="printPage()">Imprimir Registros</button>
+
+        <!-- Tabela de registros agrupados por data -->
+        <div id="print-section">
+            {% for data, entradas in entradas_agrupadas.items() %}
+            <h3>Data: {{ data }}</h3>
+            <table>
+                <tr>
+                    <th>Dia da Semana</th>
+                    <th>Cidade</th>
+                    <th>Responsável</th>
+                    <th>Horário</th>
+                    <th>Descrição</th>
+                    <th>Tempo de Condução</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                </tr>
+                {% for entrada in entradas %}
+                <tr>
+                    <td>{{ entrada['dia_semana'] }}</td>
+                    <td>{{ entrada['cidade'] }}</td>
+                    <td>{{ entrada['responsavel'] }}</td>
+                    <td>{{ entrada['horario'] }}</td>
+                    <td>{{ entrada['descricao'] }}</td>
+                    <td>{{ entrada['tempo_conducao'] }}</td>
+                    <td>{{ entrada['observacoes'] }}</td>
+                    <td>
+                        <a href="{{ url_for('delete_entrada', id=entrada['id']) }}">
+                            <button class="delete-button">Excluir</button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
